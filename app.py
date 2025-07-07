@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from dotenv import load_dotenv
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.inference.models import SystemMessage, UserMessage
@@ -8,6 +9,7 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # Habilita CORS
 
 # Configuración de Azure
 endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT")

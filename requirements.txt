@@ -3,3 +3,4 @@ azure-core
 python-dotenv
 flask
 gunicorn
+flask-cors
