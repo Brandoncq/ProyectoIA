@@ -162,10 +162,7 @@ def detect_intent(question: str, generos_disponibles: list) -> tuple:
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://front-chat-bot.vercel.app",
-        "http://localhost:5173"  # Para desarrollo local
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -274,4 +271,5 @@ if __name__ == "__main__":
     # AZURE_INFERENCE_SDK_ENDPOINT=...
     # DEPLOYMENT_NAME=...
     # AZURE_INFERENCE_SDK_KEY=...
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run("app:app", host="0.0.0.0", port=int(
+        os.environ.get("PORT", 8000)), reload=True)
