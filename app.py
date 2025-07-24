@@ -166,7 +166,7 @@ app.add_middleware(
         "https://front-chat-bot.vercel.app",
         "http://localhost:5173"  # Para desarrollo local
     ],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
