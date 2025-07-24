@@ -12,18 +12,16 @@ from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.ai.inference import ChatCompletionsClient
 from typing import List, Dict
 
-# --- 1. Azure AI Configuration ---
 load_dotenv()
 endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT")
 model_name = os.getenv("DEPLOYMENT_NAME")
 key = os.getenv("AZURE_INFERENCE_SDK_KEY")
 
-# Check if all required environment variables are set
 if not all([endpoint, model_name, key]):
     raise ValueError(
         "Missing Azure environment variables: AZURE_INFERENCE_SDK_ENDPOINT, DEPLOYMENT_NAME, AZURE_INFERENCE_SDK_KEY")
 
-# Initialize the Azure Chat Completions Client
+
 try:
     client = ChatCompletionsClient(
         endpoint=endpoint, credential=AzureKeyCredential(key)
@@ -32,7 +30,6 @@ except Exception as e:
     raise RuntimeError(f"Failed to initialize Azure client: {e}")
 
 
-# --- 2. Data Loading and Processing ---
 def load_movies() -> dict:
     """Loads movie data from the specified URL."""
     url = "https://raw.githubusercontent.com/S1lver0/Json-Ia/refs/heads/master/cine_db.json"
@@ -64,8 +61,6 @@ def filter_by_category(category: str, value: str, data: dict):
     elif category == "cartelera":
         return [m for m in peliculas if value in [h.lower() for h in m.get("horarios", [])]]
     return []
-
-# --- 3. Formatting Functions ---
 
 
 def format_movies(movies: List[Dict]) -> str:
@@ -122,15 +117,12 @@ def format_movie_details(movie: dict) -> str:
     return "\n".join(details)
 
 
-# --- 4. Prompt Templates ---
 SYSTEM_PROMPT = '''Eres un asistente de cine para CineMax Premium. Debes seguir estas reglas estrictamente:
 1. **SOLO** usa la información del contexto proporcionado. Nunca inventes datos.
 2. Para detalles de películas, usa EXCLUSIVAMENTE la información del JSON.
 3. Si no sabes algo, di amablemente que no tienes esa información.
 4. Mantén respuestas breves y en español.
 5. Para preguntas sobre películas específicas, muestra TODOS los detalles disponibles.'''
-
-# --- 5. Detección de intenciones ---
 
 
 def detect_intent(question: str, generos_disponibles: list) -> tuple:
@@ -158,7 +150,6 @@ def detect_intent(question: str, generos_disponibles: list) -> tuple:
     return "empresa", {}
 
 
-# --- 6. Configuración de FastAPI ---
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -242,7 +233,6 @@ async def recibir_mensaje(request: Request):
         else:
             user_prompt += "No se detectó una intención clara. Responde amablemente que no entiendes la pregunta."
 
-        # Call Azure AI
         response = client.complete(
             messages=[
                 SystemMessage(content=SYSTEM_PROMPT),
@@ -263,13 +253,7 @@ async def recibir_mensaje(request: Request):
         print(traceback.format_exc())
         return JSONResponse(status_code=500, content={"error": f"Ocurrió un error: {str(e)}"})
 
-# --- 7. Server Startup ---
 if __name__ == "__main__":
     import uvicorn
-    print("Starting FastAPI server...")
-    # Note: You might need to create a .env file with your Azure credentials
-    # AZURE_INFERENCE_SDK_ENDPOINT=...
-    # DEPLOYMENT_NAME=...
-    # AZURE_INFERENCE_SDK_KEY=...
     uvicorn.run("app:app", host="0.0.0.0", port=int(
         os.environ.get("PORT", 8000)), reload=True)
