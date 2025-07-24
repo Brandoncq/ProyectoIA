@@ -153,7 +153,8 @@ def detect_intent(question: str, generos_disponibles: list) -> tuple:
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://front-chat-bot.vercel.app"],
+    allow_origins=["https://front-chat-bot.vercel.app",
+                   "https://brandoncq.github.io/Front-ChatBot"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
